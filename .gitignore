@@ -1,0 +1,5 @@
+parent/application-resource-properties/pom.xml
+parent/application-resource-properties/src/main/resources/xml
+target
+.mvn
+.idea

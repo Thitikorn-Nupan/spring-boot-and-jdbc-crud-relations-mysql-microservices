@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <!--
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.5.0</version>
+        <relativePath/>
+        -->
+        <groupId>com.ttknp</groupId>
+        <artifactId>application-resource-properties</artifactId>
+        <relativePath>../../parent/application-resource-properties</relativePath>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+    <groupId>com.ttknp</groupId>
+    <artifactId>one-to-many-runner</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>runner</name>
+    <description>runner</description>
+    <url/>
+    <licenses>
+        <license/>
+    </licenses>
+    <developers>
+        <developer/>
+    </developers>
+    <scm>
+        <connection/>
+        <developerConnection/>
+        <tag/>
+        <url/>
+    </scm>
+    <properties>
+        <!--<main.basedir>${project.parent.basedir}</main.basedir>-->
+        <java.version>17</java.version>
+    </properties>
+    <dependencies>
+        <!--<dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>-->
+
+        <!-- module for connect datasource (database) -->
+        <dependency>
+            <groupId>com.ttknp</groupId>
+            <artifactId>connect-datasource-service</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
+        <!---->
+        <dependency>
+            <groupId>com.ttknp</groupId>
+            <artifactId>one-to-many-rest-api-controller</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <!--
+            i have to add this because i can't access @area.b.runner@ it's not found *** see by ctrl (hold) + click left
+            so i fix by add
+            <resources>
+                <resource>
+                    <directory>src/main/resources</directory>
+                    <filtering>true</filtering>
+                </resource>
+            </resources>
+        -->
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
