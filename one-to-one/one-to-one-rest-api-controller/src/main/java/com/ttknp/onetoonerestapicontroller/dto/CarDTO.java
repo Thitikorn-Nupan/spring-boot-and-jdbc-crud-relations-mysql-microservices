@@ -5,13 +5,18 @@ import com.ttknp.logservice.LogService;
 import com.ttknp.onetoonerestapicontroller.entities.Car;
 import com.ttknp.onetoonerestapicontroller.entities.Engine;
 import com.ttknp.onetoonerestapicontroller.services.ModelJdbcExecute;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -23,13 +28,22 @@ public class CarDTO extends ModelJdbcExecute<Car> { // JdbcExecuteHelper jdbcExe
 
     @Override
     public List<Car> findAll() {
-        return this.jdbcExecuteHelper.selectAll(Car.class);
+        return this.jdbcSelectExecuteHelper.selectAll(Car.class);
     }
 
     @Override
-    public Set<Car> findAllRelationsModels() {
+    public Set<Car> findAllRelationsModels() { // write sql statement on own
         return jdbcExecuteHelper.selectRelation(SQLOneToOne.SELECT_ALL_CARS_ENGINES,new CarsJoinEnginesResultSetExtractor());
     }
+
+    public Set<Car> findAllRelationsModelsTest() { // dynamic sql statement
+        return (Set<Car>) jdbcSelectExecuteHelper.selectRelation(Car.class, Engine.class,"cars_engines","cid","eid",new CarsJoinEnginesResultSetExtractor());
+    }
+
+    public Set<Car> findAllRelationsModelsWhereTest(String cid) {
+        return (Set<Car>) jdbcSelectExecuteHelper.selectRelationWhereMain(Car.class, Engine.class,"cars_engines","cid","eid",new CarsJoinEnginesResultSetExtractor(),cid);
+    }
+
 
     @Override
     public <U> List<U> findAllOnlyColumn(String columnName) {
@@ -44,17 +58,24 @@ public class CarDTO extends ModelJdbcExecute<Car> { // JdbcExecuteHelper jdbcExe
                 break;
         }
         SERVICE.log.info("sql is {}",sql);
-        return jdbcExecuteHelper.selectAllOnlyColumn(Car.class,(Class<U>) aClass,columnName);
+        return jdbcSelectExecuteHelper.selectAllOnlyColumn(Car.class,aClass,columnName);
     }
 
     @Override
     public <U> Car findOneByPk(U pk) {
-        return jdbcExecuteHelper.selectOne(Car.class,"cid",pk);
+        return (Car) jdbcSelectExecuteHelper.selectOne(Car.class,"cid",pk);
     }
 
     @Override
     public Integer saveModel(Car model) {
-        return jdbcExecuteHelper.insertOne(Car.class,model);
+        // return jdbcExecuteHelper.insertOne(Car.class,model);
+        return jdbcUpdateExecuteHelper.insertOne(Car.class,
+                model.getCid(),
+                model.getBrand(),
+                model.getModel(),
+                model.getPrice(),
+                model.getReleaseDate()
+                );
     }
 
     @Override
@@ -71,16 +92,22 @@ public class CarDTO extends ModelJdbcExecute<Car> { // JdbcExecuteHelper jdbcExe
 
     @Override
     public <U> Integer deleteModelByPk(U pk) {
-        if (jdbcExecuteHelper.countRows(SQLOneToOne.SELECT_COUNT_RELATIONS_BY_CARS_PK,pk) > 0) { // check relations
-            SERVICE.log.debug("Delete relations affected {}",jdbcExecuteHelper.delete(SQLOneToOne.DELETE_RELATIONS_BY_CARS_PK,pk)); // remove relations
+        if (jdbcSelectExecuteHelper.selectCountAllWhere(Car.class,"cid",pk) > 0) { // check relations
+            // just for converting to table name
+            @Table(name="cars_engines")
+            class CarsEngines {
+                CarsEngines(){
+                }
+            }
+            SERVICE.log.debug("Delete relations affected {}",jdbcUpdateExecuteHelper.deleteOne(CarsEngines.class,"cid",pk)); // remove relations
         }
         SERVICE.log.debug("Delete without relation");
-        return jdbcExecuteHelper.delete(SQLOneToOne.DELETE_ONE_CARS,pk);
+        return jdbcUpdateExecuteHelper.deleteOne(Car.class,"cid",pk);
     }
 
 
     public Integer countRowsByColum(String columName,String value) {
-        return jdbcExecuteHelper.countRowsByTableAndProperty(Car.class,columName,value);
+        return jdbcSelectExecuteHelper.selectCountAllWhere(Car.class,columName,value); // count where
     }
 
     private static class CarsJoinEnginesResultSetExtractor implements ResultSetExtractor<Set<Car>> {

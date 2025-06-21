@@ -41,6 +41,21 @@ public class CarController extends ModelController<Car> {
                 .body(this.carDTO.findAllRelationsModels());
     }
 
+    @GetMapping(value = "/reads-relations-test") // dynamic sql
+    protected ResponseEntity<Set<Car>> readsRelationsTest() {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(this.carDTO.findAllRelationsModelsTest());
+    }
+
+
+    @GetMapping(value = "/reads-relations-where-test") // dynamic sql
+    protected ResponseEntity<Set<Car>> readsRelationsWhereTest(@RequestParam("pk") String pk) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(this.carDTO.findAllRelationsModelsWhereTest(pk));
+    }
+
     @Override
     protected ResponseEntity<List<Object>> readsSpecifyColumn(@PathVariable("columnName") String columnName) { // in jdk 17 have to specify path var name
         return ResponseEntity

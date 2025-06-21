@@ -1,6 +1,8 @@
 package com.ttknp.onetoonerestapicontroller.services;
 
 import com.ttknp.jdbcservice.helpers.jdbc.JdbcExecuteHelper;
+import com.ttknp.jdbcservice.helpers.jdbc_select.JdbcSelectExecuteHelper;
+import com.ttknp.jdbcservice.helpers.jdbc_update.JdbcUpdateExecuteHelper;
 import com.ttknp.onetoonerestapicontroller.entities.Car;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -12,6 +14,10 @@ public abstract class ModelJdbcExecute<T> {
     // no need CDI in abs class
     @Autowired
     protected JdbcExecuteHelper jdbcExecuteHelper;
+    @Autowired
+    protected JdbcSelectExecuteHelper jdbcSelectExecuteHelper;
+    @Autowired
+    protected JdbcUpdateExecuteHelper jdbcUpdateExecuteHelper;
 
     public abstract List<T> findAll();
     public abstract Set<T> findAllRelationsModels();

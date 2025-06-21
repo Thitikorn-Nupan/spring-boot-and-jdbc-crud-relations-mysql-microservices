@@ -20,7 +20,7 @@ public class EngineDTO extends ModelJdbcExecute<Engine> { // JdbcExecuteHelper j
 
     @Override
     public List<Engine> findAll() {
-        return this.jdbcExecuteHelper.selectAll(Engine.class);
+        return this.jdbcSelectExecuteHelper.selectAll(Engine.class);
     }
 
     @Override
@@ -30,15 +30,12 @@ public class EngineDTO extends ModelJdbcExecute<Engine> { // JdbcExecuteHelper j
 
     @Override
     public <U> List<U> findAllOnlyColumn(String columnName) {
-        String sql = String.format(SQLOneToOne.SELECT_ALL_SPECIFY_COLUMN_ENGINES, columnName);
-        Class<?> aClass = String.class;
-        SERVICE.log.info("sql is {}",sql);
-        return jdbcExecuteHelper.selectAllOnlyColumn(Engine.class,(Class<U>) aClass,columnName);
+        return jdbcSelectExecuteHelper.selectAllOnlyColumn(Engine.class, String.class,columnName);
     }
 
     @Override
     public <U> Engine findOneByPk(U pk) {
-        return jdbcExecuteHelper.selectOne(Engine.class,"eid",pk);
+        return (Engine) jdbcSelectExecuteHelper.selectOne(Engine.class,"eid",pk);
     }
 
     @Override
@@ -57,7 +54,7 @@ public class EngineDTO extends ModelJdbcExecute<Engine> { // JdbcExecuteHelper j
     }
 
     public Integer countRowsByColum(String columName,String value) {
-        return jdbcExecuteHelper.countRowsByTableAndProperty(Engine.class,columName,value);
+        return jdbcSelectExecuteHelper.selectCountAllWhere(Engine.class,columName,value);
     }
 
 }

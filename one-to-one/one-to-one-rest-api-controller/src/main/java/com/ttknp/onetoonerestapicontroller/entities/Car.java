@@ -1,5 +1,7 @@
 package com.ttknp.onetoonerestapicontroller.entities;
 
+import com.ttknp.jdbcservice.helpers.annotation.IgnoreGenerateSQL;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.math.BigDecimal;
@@ -15,8 +17,9 @@ public class Car {
     private String brand;
     private String model;
     private BigDecimal price; // Using BigDecimal for DECIMAL(8,2)
+    @Column("release_date") // for dynamic sql
     private LocalDate releaseDate; // on json can be string as "2024-12-30"
-
+    @IgnoreGenerateSQL
     private Engine engine;
 
     public Car(String cid, String brand, String model, BigDecimal price, LocalDate releaseDate) {
