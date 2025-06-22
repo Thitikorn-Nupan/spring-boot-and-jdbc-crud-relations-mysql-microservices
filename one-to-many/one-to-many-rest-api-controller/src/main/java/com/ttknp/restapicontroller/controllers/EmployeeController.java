@@ -22,7 +22,7 @@ public class EmployeeController extends ModelController<Employee> {
         this.modelService = modelService;
     }
 
-     @GetMapping(value = "/reads")
+    @GetMapping(value = "/reads")
     @Override
     public ResponseEntity<List<Employee>> reads() {
         return ResponseEntity

@@ -7,11 +7,10 @@ import com.ttknp.restapicontroller.entities.Address;
 import com.ttknp.restapicontroller.services.ModelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-
 import java.util.List;
 import java.util.Set;
 
+// Done Logic on EmployeeDTO
 @Service
 public class AddressDTO implements ModelService<Address> {
 
@@ -36,7 +35,7 @@ public class AddressDTO implements ModelService<Address> {
     @Override
     public <U> List<U> findAllOnlyColumn(String columnName) {
         String sql = String.format(SQLOneToMany.SELECT_ALL_SPECIFY_COLUMN_ADDRESSES, columnName);
-        SERVICE.log.info("sql is {}",sql);
+        // SERVICE.log.info("sql is {}",sql);
         return jdbcExecuteHelper.selectAllOnlyColumn(sql, (Class<U>) String.class);
     }
 

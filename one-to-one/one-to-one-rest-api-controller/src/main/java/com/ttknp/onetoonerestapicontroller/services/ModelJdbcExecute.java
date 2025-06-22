@@ -18,14 +18,16 @@ public abstract class ModelJdbcExecute<T> {
     protected JdbcSelectExecuteHelper jdbcSelectExecuteHelper;
     @Autowired
     protected JdbcUpdateExecuteHelper jdbcUpdateExecuteHelper;
-
+    // Reads
     public abstract List<T> findAll();
     public abstract Set<T> findAllRelationsModels();
     public abstract <U> List<U> findAllOnlyColumn(String columnName);
     public abstract <U> T findOneByPk(U pk);
     // Create
     public abstract Integer saveModel(T model);
+    // Update
     public abstract <U> Integer updateModelByPk(T model, U pk);
+    // Delete
     public abstract <U> Integer deleteModelByPk( U pk);
 
 }

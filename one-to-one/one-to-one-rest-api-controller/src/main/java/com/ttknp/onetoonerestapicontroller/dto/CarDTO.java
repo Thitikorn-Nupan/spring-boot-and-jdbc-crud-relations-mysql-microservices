@@ -5,22 +5,18 @@ import com.ttknp.logservice.LogService;
 import com.ttknp.onetoonerestapicontroller.entities.Car;
 import com.ttknp.onetoonerestapicontroller.entities.Engine;
 import com.ttknp.onetoonerestapicontroller.services.ModelJdbcExecute;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Service;
-
-import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+// Done Logic
 @Service
 public class CarDTO extends ModelJdbcExecute<Car> { // JdbcExecuteHelper jdbcExecuteHelper injects on ModelJdbcExecute abs class
 
@@ -32,8 +28,8 @@ public class CarDTO extends ModelJdbcExecute<Car> { // JdbcExecuteHelper jdbcExe
     }
 
     @Override
-    public Set<Car> findAllRelationsModels() { // write sql statement on own
-        return jdbcExecuteHelper.selectRelation(SQLOneToOne.SELECT_ALL_CARS_ENGINES,new CarsJoinEnginesResultSetExtractor());
+    public Set<Car> findAllRelationsModels() {
+        return jdbcExecuteHelper.selectRelation(SQLOneToOne.SELECT_ALL_CARS_ENGINES,new CarsJoinEnginesResultSetExtractor()); // write sql statement on own
     }
 
     public Set<Car> findAllRelationsModelsTest() { // dynamic sql statement
@@ -68,7 +64,6 @@ public class CarDTO extends ModelJdbcExecute<Car> { // JdbcExecuteHelper jdbcExe
 
     @Override
     public Integer saveModel(Car model) {
-        // return jdbcExecuteHelper.insertOne(Car.class,model);
         return jdbcUpdateExecuteHelper.insertOne(Car.class,
                 model.getCid(),
                 model.getBrand(),
@@ -79,9 +74,10 @@ public class CarDTO extends ModelJdbcExecute<Car> { // JdbcExecuteHelper jdbcExe
     }
 
     @Override
-    public <U> Integer updateModelByPk(Car model, U pk) {
-        return jdbcExecuteHelper.update(
-                SQLOneToOne.UPDATE_ONE_CARS,
+    public <U> Integer updateModelByPk(Car model, U pk) { // ***
+        return jdbcUpdateExecuteHelper.updateOne(
+                Car.class,
+                "cid",
                 model.getBrand(),
                 model.getModel(),
                 model.getPrice(),

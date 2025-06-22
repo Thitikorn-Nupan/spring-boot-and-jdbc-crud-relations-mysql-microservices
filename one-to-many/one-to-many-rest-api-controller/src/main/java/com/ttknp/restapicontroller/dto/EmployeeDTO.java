@@ -9,7 +9,6 @@ import com.ttknp.restapicontroller.services.ModelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -18,6 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+// Done Logic query by writing sql statements
 @Service
 public class EmployeeDTO implements ModelService<Employee> {
 
@@ -29,15 +29,18 @@ public class EmployeeDTO implements ModelService<Employee> {
         this.jdbcExecuteHelper = jdbcExecuteHelper;
     }
 
+
     @Override
     public List<Employee> findAll() {
         return jdbcExecuteHelper.selectAll(SQLOneToMany.SELECT_ALL_EMPLOYEES, Employee.class);
     }
 
+
     @Override
     public Set<Employee> findAllRelationsModels() {
         return jdbcExecuteHelper.selectRelation(SQLOneToMany.SELECT_ALL_EMPLOYEES_ADDRESSES,new EmployeesJoinAddressesResultSetExtractor());
     }
+
 
     @Override
     public <U> List<U> findAllOnlyColumn(String columnName) {
@@ -51,9 +54,10 @@ public class EmployeeDTO implements ModelService<Employee> {
             default: aClass = String.class;
             break;
         }
-        SERVICE.log.info("sql is {}",sql);
+        // SERVICE.log.info("sql is {}",sql);
         return jdbcExecuteHelper.selectAllOnlyColumn(sql, (Class<U>) aClass);
     }
+
 
     @Override
     public Employee findOneBy(Object... params) {
@@ -66,11 +70,14 @@ public class EmployeeDTO implements ModelService<Employee> {
         return jdbcExecuteHelper.selectOne(SQLOneToMany.SELECT_ONE_EMPLOYEES_BY_PK, Employee.class,pk);
     }
 
+
+    /**
+        if you see what return on SELECT_ONE_EMPLOYEES_ADDRESSES_BY_EMPLOYEES_PK
+        it returns same employee record ,if employee has more 1 addresses
+        So the good way to map try using ResultSetExtractor as manual mapping
+    */
     @Override
     public <U> Employee findOneRelationsModelsByPk(U pk) {
-        // if you see what return on SELECT_ONE_EMPLOYEES_ADDRESSES_BY_EMPLOYEES_PK
-        // it returns same employee record ,if employee has more 1 addresses
-        // So the good way to map try using ResultSetExtractor as manual mapping
         return jdbcExecuteHelper.selectRelation(SQLOneToMany.SELECT_ONE_EMPLOYEES_ADDRESSES_BY_EMPLOYEES_PK,new EmployeeJoinAddressesResultSetExtractor(),pk);
     }
 
@@ -79,6 +86,7 @@ public class EmployeeDTO implements ModelService<Employee> {
     public Integer countAllRows() {
         return jdbcExecuteHelper.countRows(SQLOneToMany.SELECT_COUNT_EMPLOYEES);
     }
+
 
     @Override
     public Integer saveModel(Employee model) {
@@ -118,7 +126,6 @@ public class EmployeeDTO implements ModelService<Employee> {
 
     @Override
     public <U> Integer deleteModelByPk(U pk) {
-        // int rowAffected = jdbcExecuteHelper.countRows(SQLOneToMany.SELECT_COUNT_RELATIONS_BY_EMPLOYEES_PK);
         if (jdbcExecuteHelper.countRows(SQLOneToMany.SELECT_COUNT_RELATIONS_BY_EMPLOYEES_PK,pk) > 0) { // check relations
             SERVICE.log.debug("Delete relations affected {}",jdbcExecuteHelper.delete(SQLOneToMany.DELETE_RELATIONS_BY_EMPLOYEES_PK,pk)); // remove relations
         }
@@ -127,6 +134,7 @@ public class EmployeeDTO implements ModelService<Employee> {
     }
 
 
+    // This way works if you set Override equals() and hashCode() on your POJOs
     private static class EmployeeJoinAddressesResultSetExtractor implements ResultSetExtractor<Employee> {
         @Override
         public Employee extractData(ResultSet rs) throws SQLException {
@@ -155,7 +163,6 @@ public class EmployeeDTO implements ModelService<Employee> {
             return employee;
         }
     }
-
 
     private static class EmployeesJoinAddressesResultSetExtractor implements ResultSetExtractor<Set<Employee>> {
         @Override

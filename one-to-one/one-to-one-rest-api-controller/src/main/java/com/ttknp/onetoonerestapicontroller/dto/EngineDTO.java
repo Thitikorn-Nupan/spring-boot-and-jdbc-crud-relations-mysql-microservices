@@ -1,18 +1,14 @@
 package com.ttknp.onetoonerestapicontroller.dto;
 
-import com.ttknp.drivermysqlservice.relations_lab_core_37.one_to_many.SQLOneToMany;
-import com.ttknp.drivermysqlservice.relations_lab_core_37.one_to_one.SQLOneToOne;
+
 import com.ttknp.logservice.LogService;
-import com.ttknp.onetoonerestapicontroller.entities.Engine;
 import com.ttknp.onetoonerestapicontroller.entities.Engine;
 import com.ttknp.onetoonerestapicontroller.services.ModelJdbcExecute;
 import org.springframework.stereotype.Service;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
+// Done Logic on CarDTO
 @Service
 public class EngineDTO extends ModelJdbcExecute<Engine> { // JdbcExecuteHelper jdbcExecuteHelper injects on ModelJdbcExecute abs class
 
@@ -40,12 +36,17 @@ public class EngineDTO extends ModelJdbcExecute<Engine> { // JdbcExecuteHelper j
 
     @Override
     public Integer saveModel(Engine model) {
-        return jdbcExecuteHelper.insertOne(Engine.class,model);
+        return 0;
     }
 
     @Override
     public <U> Integer updateModelByPk(Engine model, U pk) {
-        return 0;
+        return jdbcUpdateExecuteHelper.updateOne(
+                Engine.class,
+                "eid",
+                model.getCode(),
+                pk
+                );
     }
 
     @Override

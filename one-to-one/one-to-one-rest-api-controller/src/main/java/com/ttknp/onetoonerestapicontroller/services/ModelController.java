@@ -21,10 +21,8 @@ public abstract class ModelController <T> {
     protected abstract ResponseEntity<Set<T>> readsRelations();
     @GetMapping(value = "/reads/{columnName}") // in jdk 17 have to specify path var name
     protected abstract ResponseEntity<List<Object>> readsSpecifyColumn(String columnName);
-
     @GetMapping(value = "/read/{pk}") // in jdk 17 have to specify path var name
     protected abstract ResponseEntity<T> readByPrimaryKey(String pk);
-
     @PostMapping(value = "/create")
     protected abstract ResponseEntity<Integer> create(T model);
     @PutMapping(value = "/update")

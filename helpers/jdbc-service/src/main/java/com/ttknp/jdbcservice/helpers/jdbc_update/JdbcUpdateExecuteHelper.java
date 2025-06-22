@@ -3,6 +3,8 @@ package com.ttknp.jdbcservice.helpers.jdbc_update;
 import com.ttknp.jdbcservice.helpers.annotation.IgnoreGenerateSQL;
 import com.ttknp.jdbcservice.helpers.service.UsefulJdbcService;
 import com.ttknp.logservice.LogService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -23,6 +25,7 @@ public class JdbcUpdateExecuteHelper<T> {
     private final UsefulJdbcService usefulJdbcService;
     private final String INSERT  = "insert into ";
     private final String DELETE  = "delete from ";
+    private final String UPDATE  = "update ";
     private final String ASSIGN_PARAM  = " = ?";
     private final String ASSIGN  = " ?";
 
@@ -86,6 +89,8 @@ public class JdbcUpdateExecuteHelper<T> {
                         .append(" ,");
             }
 
+            /*
+            Get bug some cases (case one field)
             if (i == fields.length - 1) { // remove the last comma
                 stringBuilderSQL
                         .deleteCharAt(stringBuilderSQL.length() - 1)
@@ -95,8 +100,17 @@ public class JdbcUpdateExecuteHelper<T> {
                         .deleteCharAt(stringBuilderSQLValues.length() - 1)
                         .append(")");
             }
+            */
 
         } // end for
+
+        stringBuilderSQL
+                .deleteCharAt(stringBuilderSQL.length() - 1)
+                .append(")");
+
+        stringBuilderSQLValues
+                .deleteCharAt(stringBuilderSQLValues.length() - 1)
+                .append(")");
 
         stringBuilderSQL
                 .append(stringBuilderSQLValues);
@@ -105,6 +119,62 @@ public class JdbcUpdateExecuteHelper<T> {
         return executeUpdate(stringBuilderSQL.toString(),params);
     }
 
+    public Integer updateOne(Class<T> aBeanClass, String uniqColumnName,Object ...params){
+
+        StringBuilder stringBuilderSQL;
+
+        stringBuilderSQL = new StringBuilder();
+
+        stringBuilderSQL.append(UPDATE);
+        stringBuilderSQL.append(usefulJdbcService.getTableNameOnTableAnnotation(aBeanClass));
+        stringBuilderSQL.append(" set ");
+
+        Field[] fields = aBeanClass.getDeclaredFields(); // get each props as array of class
+
+        for (int i = 0; i < fields.length ; i++) {
+
+            Field field = fields[i];
+
+            boolean foundIgnoreField = field.isAnnotationPresent(IgnoreGenerateSQL.class); // check annotation present on prop
+
+            if (!foundIgnoreField) {
+
+                Column columnAnnotation = null;
+                String fieldName;
+                boolean foundCustomField = field.isAnnotationPresent(Column.class);
+
+                if (foundCustomField) {
+                    columnAnnotation = field.getAnnotation(Column.class);
+                }
+
+                if (columnAnnotation != null) { // check if property name (POJO) it's not the same column name (Field Table)
+                    fieldName = columnAnnotation.value();  // columnAnnotation => @org.springframework.data.relational.core.mapping.Column("full_name") columnAnnotation.value() =>  full_name
+                }
+                else {
+                    fieldName = field.getName();
+                }
+
+                if (!uniqColumnName.equals(fieldName)) {
+                    stringBuilderSQL.append(fieldName)
+                            .append(ASSIGN_PARAM)
+                            .append(" ,");
+                }
+
+                // Get bug some cases if i do where inside loop
+
+            }
+
+        } // end for
+
+        stringBuilderSQL
+                .deleteCharAt(stringBuilderSQL.length() - 1)
+                .append(" where ")
+                .append(uniqColumnName)
+                .append(ASSIGN_PARAM);
+
+        SERVICE.log.debug("sql update = {}", stringBuilderSQL.toString());
+        return executeUpdate(stringBuilderSQL.toString(),params);
+    }
 
     public Integer deleteOne(Class<T> aBeanClass,String uniqColumnName, Object ...params) {
         StringBuilder stringBuilderSQL = new StringBuilder()
@@ -114,7 +184,6 @@ public class JdbcUpdateExecuteHelper<T> {
                 .append(ASSIGN_PARAM);
         return executeUpdate(stringBuilderSQL.toString(),params);
     }
-
 
 
 }
